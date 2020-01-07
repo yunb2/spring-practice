@@ -7,13 +7,14 @@ import kr.co.fastcampus.eatgo.domain.RestaurantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
 public class RestaurantService {
 
     @Autowired
-    RestaurantRepository restaurantRepository;
+    private RestaurantRepository restaurantRepository;
 
     @Autowired
     private MenuItemRepository menuItemRepository;
@@ -23,8 +24,8 @@ public class RestaurantService {
         this.menuItemRepository = menuItemRepository;
     }
 
-    public Restaurant getRestaurantById(Long id) {
-        Restaurant restaurant = restaurantRepository.findById(id);
+    public Restaurant getRestaurant(Long id) {
+        Restaurant restaurant = restaurantRepository.findById(id).orElse(null);
 
         List<MenuItem> menuItems = menuItemRepository.findAllByRestaurantId(id);
         restaurant.setMenuItems(menuItems);
@@ -37,4 +38,16 @@ public class RestaurantService {
         return restaurants;
     }
 
+    public Restaurant addRestaurant(Restaurant restaurant) {
+        return restaurantRepository.save(restaurant);
+    }
+
+    @Transactional
+    public Restaurant updateRestaurant(long id, String name, String address) {
+        Restaurant restaurant = restaurantRepository.findById(id).orElse(null);
+
+        restaurant.updateInformation(name, address);
+
+        return restaurant;
+    }
 }
